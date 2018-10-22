@@ -31,6 +31,10 @@
         font-weight: 500;
         padding-bottom: 20px;
     }
+    a, a:hover, a:visited, a:active {
+        color: #777474;
+        text-decoration: underline;
+    }
     h2 {
         font-size: 1.1em;
         color: #312f2f;
@@ -58,7 +62,7 @@
     <div class="content">
         <h1>GitHub <span class="subtitle">Status Generator</span></h1>
         <h3>What is this site?</h3>
-        <p>GitHub's down and I can't really do work. So out of boredome, I made this site to make sure you never run out of slightly different status messages from GitHub.</p>
+        <p>GitHub's down and I can't really do work. So out of boredom, I made this site to make sure you never run out of slightly different status messages from GitHub. Made by <a href="https://www.aapelivuorinen.com">Aapeli Vuorinen</a>, for your entertainment. Check it out on <a href="https://github.com/aapeliv/github-status-generator.com">GitHub</a> if they're back up.</p>
         <h2>Status Messages</h2>
         <h3 id="today">October 22, 2018</h3>
         <div class="row">
@@ -69,6 +73,8 @@
                 <p id="smsg">We continue work to repair a data storage system for GitHub.com. You may see inconsistent results during this process.</p>
             </div>
         </div>
+        <h2>New status</h2>
+        <p><a href="/">Create a new status.</a></p>
     </div>
     <script>
         //! moments.js
@@ -91,8 +97,8 @@
         }
         return sentence;
     }
-    window.onload = function () {
-        var t = parseInt(window.location.search.substr(1).trim()) || (new Date).getTime();
+    function resetSentence() {
+        var t = parseInt(window.location.hash.substr(1)) || (new Date).getTime();
         var m = moment(t);
         var sentence = newSentence(t);
         var smsg = document.getElementById("smsg");
@@ -101,8 +107,9 @@
         today.innerHTML = m.format('LL');
         var stime = document.getElementById("stime");
         stime.innerHTML = m.format('LT');
-        location.href = "http://127.0.0.1:8081/#"+t.toString();
+        location.href = "https://github-status-generator.com/#"+t.toString();
     }
+    window.onload = resetSentence;
     </script>
   </body>
 </html>
