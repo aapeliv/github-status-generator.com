@@ -52,7 +52,7 @@
     .msg {
         flex: 5;
     }
-    #smsg {
+    .smsg {
         color: #cf3535;
         font-weight: 700;
     }
@@ -63,18 +63,20 @@
         <h1>GitHub <span class="subtitle">Status Generator</span></h1>
         <h3>What is this site?</h3>
         <p>GitHub's down and I can't really do work. So out of boredom, I made this site to make sure you never run out of slightly different status messages from GitHub. Made by <a href="https://www.aapelivuorinen.com">Aapeli Vuorinen</a>, for your entertainment. Check it out on <a href="https://github.com/aapeliv/github-status-generator.com">GitHub</a> if they're back up.</p>
+        <h2>New status</h2>
+        <p><a onclick="javascript:addSentence()" href="javascript:void(0);">Add a new status.</a></p>
         <h2>Status Messages</h2>
         <h3 id="today">October 22, 2018</h3>
-        <div class="row">
-            <div class="time">
-                <p id="stime">00:00</p>
-            </div>
-            <div class="msg">
-                <p id="smsg">We continue work to repair a data storage system for GitHub.com. You may see inconsistent results during this process.</p>
+        <div id="rows">
+            <div class="row">
+                <div class="time">
+                    <p id="stime">00:00</p>
+                </div>
+                <div class="msg">
+                    <p id="smsg">We continue work to repair a data storage system for GitHub.com. You may see inconsistent results during this process.</p>
+                </div>
             </div>
         </div>
-        <h2>New status</h2>
-        <p><a href="/">Create a new status.</a></p>
     </div>
     <script>
         //! moments.js
@@ -97,19 +99,49 @@
         }
         return sentence;
     }
-    function resetSentence() {
-        var t = parseInt(window.location.hash.substr(1)) || (new Date).getTime();
-        var m = moment(t);
-        var sentence = newSentence(t);
-        var smsg = document.getElementById("smsg");
-        smsg.innerHTML = sentence;
-        var today = document.getElementById("today");
-        today.innerHTML = m.format('LL');
-        var stime = document.getElementById("stime");
-        stime.innerHTML = m.format('LT');
-        location.href = "https://github-status-generator.com/#"+t.toString();
+    function renderSentences(ts) {
+        var rows = document.getElementById("rows");
+        rows.innerHTML = "";
+        for (var i = ts.length - 1; i >= 0; i--) {
+            var t = ts[i];
+            var m = moment(t);
+            var sentence = newSentence(t);
+            var row = document.createElement("div");
+            row.className = "row";
+            rows.appendChild(row);
+            var time = document.createElement("div");
+            time.className = "time";
+            row.appendChild(time);
+            var msg = document.createElement("div");
+            msg.className = "msg";
+            row.appendChild(msg);
+            var smsg = document.createElement("p");
+            smsg.className = "smsg";
+            smsg.innerHTML = sentence;
+            msg.appendChild(smsg);
+            var stime = document.createElement("p");
+            stime.innerHTML = m.format('LT');
+            time.appendChild(stime);
+            var today = document.getElementById("today");
+            today.innerHTML = m.format('LL');
+        }
     }
-    window.onload = resetSentence;
+    function getTsFromHash() {
+        return window.location.hash.replace(/[^0-9-]/g,"").split("-").filter(x => !(x.trim() === "")).map(x => parseInt(x));
+    }
+    function addSentence() {
+        var ts = getTsFromHash().concat([(new Date).getTime()]);
+        renderSentences(ts);
+        location.href = "https://github-status-generator.com/#"+ts.map(t => t.toString()).join("-");
+    }
+    window.onload = function() {
+        if (window.location.hash.trim() === "") {
+            addSentence();
+        } else {
+            var ts = getTsFromHash();
+            renderSentences(ts);
+        }
+    };
     </script>
   </body>
 </html>
